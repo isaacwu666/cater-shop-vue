@@ -8,6 +8,7 @@ const { spawn } = require('child_process')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const webpackHotMiddleware = require('webpack-hot-middleware')
+const httpProxyMiddleware = require('http-proxy-middleware')
 
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
@@ -73,7 +74,12 @@ function startRenderer () {
       }
     )
 
-    server.listen(9080)
+    server.use(httpProxyMiddleware({
+      target: 'http://localhost:8082',
+      changeOrigin: true
+    }))
+
+      server.listen(9080)
   })
 }
 

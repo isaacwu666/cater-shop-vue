@@ -7,13 +7,14 @@ import store from './store'
 import web_config from './config/web_config'
 
 
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 
 Vue.axios = Vue.prototype.$axios = axios
 //项目自定义陪着
 Vue.WebConfig=Vue.prototype.$webConfig=web_config;
 
-axios.defaults.baseURL = 'http://localhost:18080'
+axios.defaults.baseURL = 'sys'
 
 Vue.config.productionTip = false
 
@@ -34,4 +35,16 @@ new Vue({
   router,
   store,
   template: '<App/>'
-}).$mount('#app')
+}).$mount('#app');
+
+axios.interceptors.response.use(function (res) {
+  if (res.data.state==-1){
+    ElementUI.Message.info("未登录")
+    this.$router.push("/login")
+
+  }
+  return res;
+},function (error) {
+  ElementUI.Message.error("网络失败")
+  return Promise.reject(error)
+})

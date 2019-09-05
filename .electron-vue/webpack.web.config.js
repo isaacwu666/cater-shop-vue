@@ -9,12 +9,45 @@ const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const httpProxyMiddleware = require('http-proxy-middleware')
+
 
 let webConfig = {
+
+
+
+
   devtool: '#cheap-module-eval-source-map',
+
   entry: {
     web: path.join(__dirname, '../src/renderer/main.js')
   },
+  devServer: {
+    clientLogLevel: 'warning',
+    // historyApiFallback: {
+    //   // rewrites: [
+    //   //   { from: /.*/, to: path.posix.join(config.dev.assetsPublicPath, 'index.html') },
+    //   // ],
+    // },
+    hot: true,
+    contentBase: false, // since we use CopyWebpackPlugin.
+    compress: true,
+    host: "127.0.0.1",
+    port: "8083",
+    open: true,
+    proxy:{
+      '/sys': {
+        target: 'http://localhost:8082',  //目标接口域名
+        changeOrigin: true,  //是否跨域
+        pathRewrite: {
+          '^/sys': '/sys'   //重写接口
+        }
+      },
+    },
+    quiet: true, // necessary for FriendlyErrorsPlugin
+
+  },
+
   module: {
     rules: [
       {
@@ -98,7 +131,7 @@ let webConfig = {
     },
     extensions: ['.js', '.vue', '.json', '.css']
   },
-  target: 'web'
+  target: 'web',
 }
 
 /**
